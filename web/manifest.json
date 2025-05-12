@@ -1,13 +1,19 @@
 {
+  "id": "purify-app-pwa",
   "name": "Purify App",
   "short_name": "Purify",
   "description": "Um aplicativo para gerenciar suas tarefas",
   "lang": "pt-BR",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
   "orientation": "portrait",
+  "categories": ["productivity", "utilities"],
+  "launch_handler": {
+    "client_mode": ["focus-existing", "auto"]
+  },
   "icons": [
     {
       "src": "/assets/images/pwa-192x192.png",
@@ -25,5 +31,14 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ]
+  ],
+  "screenshots": [
+    {
+      "src": "/assets/images/screenshot1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "prefer_related_applications": false
 } 
