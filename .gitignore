@@ -1,0 +1,54 @@
+# Expo
+.expo/
+dist/
+web-build/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+
+# Node
+node_modules/
+npm-debug.*
+*.log
+
+# macOS
+.DS_Store
+
+# VSCode
+.vscode/
+
+# Android/IntelliJ
+build/
+.idea
+.gradle
+local.properties
+*.iml
+*.hprof
+
+# iOS
+ios/Pods/
+*.ipa
+*.app.dSYM.zip
+*.app.map
+
+# Environment variables
+.env*
+
+# metro
+.metro-health-check*
+
+# debug
+yarn-debug.*
+yarn-error.*
+
+# macos
+*.pem
+
+# local env files
+.env*.local
+
+# typescript
+*.tsbuildinfo
