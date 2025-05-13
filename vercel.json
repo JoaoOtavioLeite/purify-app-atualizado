@@ -11,11 +11,26 @@
   ],
   "routes": [
     {
-      "src": "/(.*)",
-      "dest": "/$1",
+      "src": "/service-worker.js",
+      "dest": "/service-worker.js",
       "headers": {
         "cache-control": "public, max-age=0, must-revalidate",
         "Service-Worker-Allowed": "/"
+      }
+    },
+    {
+      "src": "/manifest.json",
+      "dest": "/manifest.json"
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html",
+      "headers": {
+        "cache-control": "public, max-age=0, must-revalidate"
       }
     }
   ]
