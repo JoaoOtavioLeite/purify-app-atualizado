@@ -11,7 +11,19 @@
   ],
   "routes": [
     {
-      "src": "/service-worker.js",
+      "src": "^/_expo/(.*)$",
+      "dest": "/_expo/$1"
+    },
+    {
+      "src": "^/assets/(.*)$",
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "^/workbox-(.*)$",
+      "dest": "/workbox-$1"
+    },
+    {
+      "src": "^/service-worker.js",
       "dest": "/service-worker.js",
       "headers": {
         "cache-control": "public, max-age=0, must-revalidate",
@@ -19,15 +31,15 @@
       }
     },
     {
-      "src": "/manifest.json",
+      "src": "^/manifest.json",
       "dest": "/manifest.json"
     },
     {
-      "src": "/assets/(.*)",
-      "dest": "/assets/$1"
+      "src": "^/favicon.ico",
+      "dest": "/favicon.ico"
     },
     {
-      "src": "/(.*)",
+      "src": "^/.*",
       "dest": "/index.html",
       "headers": {
         "cache-control": "public, max-age=0, must-revalidate"
