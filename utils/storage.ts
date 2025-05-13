@@ -32,9 +32,6 @@ interface JournalEntry {
 
 interface AppSettings {
   notifications: boolean;
-  contentFilter: boolean;
-  nightMode: boolean;
-  privacyMode: boolean;
 }
 
 // Storage keys

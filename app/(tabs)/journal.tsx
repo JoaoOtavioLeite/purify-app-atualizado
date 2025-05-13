@@ -24,7 +24,18 @@ const TRIGGERS = [
   'Redes Sociais', 
   'Noite/Madrugada', 
   'Álcool',
-  'Estar Sozinho'
+  'Estar Sozinho',
+  'Depressão',
+  'Insônia',
+  'Ociosidade',
+  'Filmes/Séries',
+  'Jogos Online',
+  'Fim de Semana',
+  'Festas',
+  'Brigas/Conflitos',
+  'Procrastinação',
+  'Rejeição',
+  'Frustração'
 ];
 
 export default function JournalScreen() {

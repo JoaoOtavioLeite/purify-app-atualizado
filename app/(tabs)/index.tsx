@@ -8,6 +8,18 @@ import { getDailyMotivation, getStreakMotivation, getRelapseMessage } from '@/ut
 import { colors, spacing, borderRadius, shadows, typography } from '@/app/styles/theme';
 import { router } from 'expo-router';
 
+const formatarData = () => {
+  const diasSemana = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+  const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+  
+  const data = new Date();
+  const diaSemana = diasSemana[data.getDay()];
+  const dia = data.getDate();
+  const mes = meses[data.getMonth()];
+  
+  return `${diaSemana}, ${dia} de ${mes}`;
+};
+
 export default function DashboardScreen() {
   const [userProfile, setUserProfile] = useState<any>(null);
   const [streak, setStreak] = useState(0);
@@ -26,14 +38,18 @@ export default function DashboardScreen() {
   }, []);
   
   const loadUserData = async () => {
-    const profile = await getUserProfile();
-    setUserProfile(profile);
-    const userStreak = await getStreak();
-    setStreak(userStreak);
-    
-    if (profile && profile.goal) {
-      const progress = Math.min(userStreak / profile.goal, 1);
-      progressValue.value = withTiming(progress, { duration: 1000 });
+    try {
+      const profile = await getUserProfile();
+      setUserProfile(profile);
+      const currentStreak = await getStreak();
+      setStreak(currentStreak);
+      
+      if (profile?.goal) {
+        const progress = Math.min(currentStreak / profile.goal, 1);
+        progressValue.value = withTiming(progress, { duration: 1000 });
+      }
+    } catch (error) {
+      console.error('Erro ao carregar dados:', error);
     }
   };
   
@@ -44,29 +60,40 @@ export default function DashboardScreen() {
   const handleCheckInResponse = async (hadRelapse: boolean) => {
     setShowCheckInModal(false);
     
-    if (hadRelapse) {
-      await recordCheckIn({ 
-        status: 'relapse', 
-        notes: 'Recaída identificada', 
-        triggers: [] 
-      });
-      setShowRelapseModal(true);
-    } else {
-      await recordCheckIn({ 
-        status: 'success', 
-        notes: 'Dia completado com sucesso', 
-        triggers: [] 
-      });
-      
-      const updatedStreak = streak + 1;
-      if (userProfile && userProfile.goal && updatedStreak >= userProfile.goal) {
-        setShowGoalAchievedModal(true);
+    try {
+      if (hadRelapse) {
+        await recordCheckIn({ 
+          status: 'relapse', 
+          notes: 'Recaída identificada', 
+          triggers: [] 
+        });
+        setStreak(0);
+        progressValue.value = withTiming(0, { duration: 1000 });
+        setShowRelapseModal(true);
       } else {
-        setShowSuccessModal(true);
+        const newStreak = streak + 1;
+        await recordCheckIn({ 
+          status: 'success', 
+          notes: 'Dia completado com sucesso', 
+          triggers: [] 
+        });
+        
+        setStreak(newStreak);
+        
+        if (userProfile?.goal) {
+          const progress = Math.min(newStreak / userProfile.goal, 1);
+          progressValue.value = withTiming(progress, { duration: 1000 });
+        }
+
+        if (userProfile?.goal && newStreak >= userProfile.goal) {
+          setShowGoalAchievedModal(true);
+        } else {
+          setShowSuccessModal(true);
+        }
       }
+    } catch (error) {
+      console.error('Erro ao registrar check-in:', error);
     }
-    
-    await loadUserData();
   };
 
   const handleRestart = async () => {
@@ -102,63 +129,58 @@ export default function DashboardScreen() {
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
         <View style={styles.header}>
-          <View>
-            <Text style={styles.greeting}>Olá, {userProfile.name}</Text>
-            <Text style={styles.date}>{new Date().toLocaleDateString('pt-BR', { weekday: 'long', month: 'long', day: 'numeric' })}</Text>
-          </View>
+          <Text style={styles.greeting}>Olá, {userProfile?.name}</Text>
+          <Text style={styles.date}>{formatarData()}</Text>
         </View>
         
         <View style={styles.streakCard}>
           <View style={styles.streakHeader}>
-            <Trophy size={24} color="#60A5FA" />
-            <Text style={styles.streakTitle}>Sequência Atual</Text>
+            <View style={styles.streakHeaderLeft}>
+              <Trophy size={20} color="#FFFFFF" />
+              <Text style={styles.streakTitle}>Você está há</Text>
+            </View>
+            <Text style={styles.streakMeta}>Meta: {userProfile?.goal || 120} dias</Text>
           </View>
-          <Text style={styles.streakCount}>{streak} dias</Text>
-          <Text style={styles.streakGoal}>Meta: {userProfile.goal} dias</Text>
+          <Text style={styles.streakCount}>{streak} dias sem cair</Text>
           
           <View style={styles.progressContainer}>
             <Animated.View style={[styles.progressBar, progressStyle]} />
           </View>
           
-          <TouchableOpacity 
-            style={styles.checkInButton} 
-            onPress={handleCheckInPress}
-          >
-            <Calendar size={24} color={colors.text.onPrimary} />
+          <TouchableOpacity style={styles.checkInButton} onPress={() => setShowCheckInModal(true)}>
+            <Calendar size={20} color="#60A5FA" />
             <Text style={styles.checkInButtonText}>Realizar check-in de hoje</Text>
           </TouchableOpacity>
         </View>
         
-        <View style={styles.motivationCard}>
-          <Text style={styles.motivationTitle}>Versículo do Dia</Text>
-          <Text style={styles.motivationVerse}>{motivation.split('\n\n')[0]}</Text>
-          <Text style={styles.motivationReference}>{motivation.split('\n\n')[1]}</Text>
+        <View style={styles.verseCard}>
+          <Text style={styles.verseTitle}>Versículo do Dia</Text>
+          <Text style={styles.verseText}>
+            Não temas, porque eu sou contigo; não te assombres, porque eu sou teu Deus; eu te fortaleço, e te ajudo, e te sustento com a minha destra fiel.
+          </Text>
+          <Text style={styles.verseReference}>Isaías 41:10</Text>
         </View>
         
-        <TouchableOpacity style={styles.journalButton} onPress={() => router.push('/journal')}>
-          <View style={styles.journalButtonContent}>
-            <View style={styles.journalButtonLeft}>
-              <Calendar size={24} color="#60A5FA" />
-              <View style={styles.journalButtonText}>
-                <Text style={styles.journalButtonTitle}>Diário</Text>
-                <Text style={styles.journalButtonSubtitle}>Registre seus pensamentos</Text>
-              </View>
+        <TouchableOpacity style={styles.actionButton} onPress={() => router.push('/journal')}>
+          <View style={styles.actionLeft}>
+            <Calendar size={20} color="#60A5FA" />
+            <View style={styles.actionTextContainer}>
+              <Text style={styles.actionTitle}>Diário</Text>
+              <Text style={styles.actionSubtitle}>Registre seus pensamentos</Text>
             </View>
-            <ChevronRight size={20} color="#64748B" />
           </View>
+          <ChevronRight size={20} color="#64748B" />
         </TouchableOpacity>
         
-        <TouchableOpacity style={styles.challengeButton} onPress={() => router.push('/challenges')}>
-          <View style={styles.challengeButtonContent}>
-            <View style={styles.challengeButtonLeft}>
-              <Trophy size={24} color="#60A5FA" />
-              <View style={styles.challengeButtonText}>
-                <Text style={styles.challengeButtonTitle}>Desafio Diário</Text>
-                <Text style={styles.challengeButtonSubtitle}>Complete o desafio de hoje</Text>
-              </View>
+        <TouchableOpacity style={styles.actionButton} onPress={() => router.push('/challenges')}>
+          <View style={styles.actionLeft}>
+            <Trophy size={20} color="#60A5FA" />
+            <View style={styles.actionTextContainer}>
+              <Text style={styles.actionTitle}>Desafio Diário</Text>
+              <Text style={styles.actionSubtitle}>Complete o desafio de hoje</Text>
             </View>
-            <ChevronRight size={20} color="#64748B" />
           </View>
+          <ChevronRight size={20} color="#64748B" />
         </TouchableOpacity>
         
         <Image 
@@ -174,9 +196,13 @@ export default function DashboardScreen() {
         >
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Check-in Diário</Text>
+              <View style={styles.modalHeader}>
+                <Calendar size={32} color="#60A5FA" />
+                <Text style={styles.modalTitle}>Check-in Diário</Text>
+              </View>
+              
               <Text style={styles.modalQuestion}>
-                Você teve alguma recaída hoje com pornografia ou masturbação?
+                Você se manteve firme hoje?
               </Text>
               
               <View style={styles.modalButtons}>
@@ -184,14 +210,16 @@ export default function DashboardScreen() {
                   style={[styles.modalButton, styles.modalButtonNo]}
                   onPress={() => handleCheckInResponse(false)}
                 >
-                  <Text style={styles.modalButtonText}>Não</Text>
+                  <CheckCircle size={24} color="#FFFFFF" />
+                  <Text style={styles.modalButtonText}>Sim, me mantive firme!</Text>
                 </TouchableOpacity>
                 
                 <TouchableOpacity 
                   style={[styles.modalButton, styles.modalButtonYes]}
                   onPress={() => handleCheckInResponse(true)}
                 >
-                  <Text style={styles.modalButtonText}>Sim</Text>
+                  <AlertTriangle size={24} color="#FFFFFF" />
+                  <Text style={styles.modalButtonText}>Não, tive uma recaída</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -211,13 +239,13 @@ export default function DashboardScreen() {
               <Text style={styles.modalMessage}>
                 Você conseguiu se manter firme por mais um dia! Continue assim!
               </Text>
-              <Text style={styles.streakCount}>
+              <Text style={styles.modalStreak}>
                 {streak} dias
               </Text>
               
               <TouchableOpacity 
                 style={[styles.modalButton, styles.modalButtonSuccess]}
-                onPress={handleSuccessContinue}
+                onPress={() => setShowSuccessModal(false)}
               >
                 <Text style={styles.modalButtonText}>Continuar</Text>
               </TouchableOpacity>
@@ -291,13 +319,13 @@ export default function DashboardScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: '#F8FAFC',
   } as ViewStyle,
   container: {
     flex: 1,
   } as ViewStyle,
   contentContainer: {
-    padding: spacing.lg,
+    padding: 16,
   } as ViewStyle,
   loadingContainer: {
     flex: 1,
@@ -305,156 +333,138 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   } as ViewStyle,
   header: {
-    marginBottom: spacing.lg,
+    marginBottom: 16,
   } as ViewStyle,
   greeting: {
-    ...typography.h2,
-    color: colors.text.primary,
+    fontSize: 20,
+    color: '#1E293B',
+    marginBottom: 4,
   } as TextStyle,
   date: {
-    ...typography.body2,
-    color: colors.text.secondary,
-    textTransform: 'capitalize',
+    fontSize: 14,
+    color: '#64748B',
   } as TextStyle,
   streakCard: {
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.xl,
-    padding: spacing.lg,
-    marginBottom: spacing.lg,
-    ...shadows.md,
+    backgroundColor: '#60A5FA',
+    borderRadius: 20,
+    padding: 16,
+    marginBottom: 16,
   } as ViewStyle,
   streakHeader: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    gap: spacing.sm,
-    marginBottom: spacing.md,
+    marginBottom: 16,
+  } as ViewStyle,
+  streakHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   } as ViewStyle,
   streakTitle: {
-    ...typography.h3,
-    color: colors.text.primary,
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '500',
+  } as TextStyle,
+  streakMeta: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    opacity: 0.9,
   } as TextStyle,
   streakCount: {
-    ...typography.h1,
-    color: colors.primary,
-    marginBottom: spacing.xs,
-  } as TextStyle,
-  streakGoal: {
-    ...typography.body2,
-    color: colors.text.secondary,
-    marginBottom: spacing.md,
+    fontSize: 42,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 16,
+    textAlign: 'center',
   } as TextStyle,
   progressContainer: {
-    height: 8,
-    backgroundColor: colors.border.light,
-    borderRadius: borderRadius.full,
-    overflow: 'hidden',
+    height: 2,
+    backgroundColor: 'rgba(255,255,255,0.3)',
+    borderRadius: 1,
+    marginBottom: 16,
   } as ViewStyle,
   progressBar: {
     height: '100%',
-    backgroundColor: colors.primary,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 1,
   } as ViewStyle,
   checkInButton: {
-    backgroundColor: colors.primary,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 14,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: spacing.md,
-    borderRadius: borderRadius.lg,
-    gap: spacing.sm,
-    marginTop: spacing.md,
-    ...shadows.sm,
+    gap: 8,
   } as ViewStyle,
   checkInButtonText: {
-    ...typography.button,
-    color: colors.text.onPrimary,
+    color: '#60A5FA',
+    fontSize: 14,
+    fontWeight: '500',
   } as TextStyle,
-  motivationCard: {
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.xl,
-    padding: spacing.xl,
-    marginBottom: spacing.lg,
-    ...shadows.md,
+  verseCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 24,
+    marginBottom: 20,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
   } as ViewStyle,
-  motivationTitle: {
-    ...typography.h3,
-    color: colors.text.primary,
-    marginBottom: spacing.md,
-    textAlign: 'center',
-  } as TextStyle,
-  motivationVerse: {
-    ...typography.body1,
-    color: colors.text.primary,
-    textAlign: 'center',
-    fontStyle: 'italic',
-    marginBottom: spacing.sm,
-    lineHeight: 24,
-  } as TextStyle,
-  motivationReference: {
-    ...typography.body2,
-    color: colors.text.secondary,
+  verseTitle: {
+    fontSize: 18,
+    color: '#1E293B',
+    marginBottom: 16,
     textAlign: 'center',
     fontWeight: '600',
   } as TextStyle,
-  actionsContainer: {
-    marginBottom: spacing.lg,
-  } as ViewStyle,
-  journalButton: {
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.lg,
-    padding: spacing.md,
-    marginBottom: spacing.md,
+  verseText: {
+    fontSize: 16,
+    color: '#1E293B',
+    textAlign: 'center',
+    fontStyle: 'italic',
+    marginBottom: 12,
+    lineHeight: 24,
+  } as TextStyle,
+  verseReference: {
+    fontSize: 14,
+    color: '#64748B',
+    textAlign: 'right',
+    marginTop: 4,
+  } as TextStyle,
+  actionButton: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 20,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    ...shadows.sm,
+    marginBottom: 16,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
   } as ViewStyle,
-  journalButtonContent: {
+  actionLeft: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 16,
   } as ViewStyle,
-  journalButtonLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  actionTextContainer: {
+    gap: 4,
   } as ViewStyle,
-  journalButtonText: {
-    marginLeft: spacing.md,
-  } as ViewStyle,
-  journalButtonTitle: {
-    ...typography.h4,
-    color: colors.text.primary,
+  actionTitle: {
+    fontSize: 16,
+    color: '#1E293B',
+    fontWeight: '600',
   } as TextStyle,
-  journalButtonSubtitle: {
-    ...typography.body2,
-    color: colors.text.secondary,
-  } as TextStyle,
-  challengeButton: {
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.lg,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    ...shadows.sm,
-  } as ViewStyle,
-  challengeButtonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  } as ViewStyle,
-  challengeButtonLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  } as ViewStyle,
-  challengeButtonText: {
-    marginLeft: spacing.md,
-  } as ViewStyle,
-  challengeButtonTitle: {
-    ...typography.h4,
-    color: colors.text.primary,
-  } as TextStyle,
-  challengeButtonSubtitle: {
-    ...typography.body2,
-    color: colors.text.secondary,
+  actionSubtitle: {
+    fontSize: 14,
+    color: '#64748B',
   } as TextStyle,
   backgroundImage: {
     position: 'absolute',
@@ -465,54 +475,53 @@ const styles = StyleSheet.create({
   } as ImageStyle,
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
     justifyContent: 'center',
     alignItems: 'center',
+    padding: spacing.lg,
   } as ViewStyle,
   modalContent: {
     backgroundColor: colors.surface,
     borderRadius: borderRadius.xl,
     padding: spacing.xl,
-    width: '90%',
+    width: '100%',
     maxWidth: 400,
     alignItems: 'center',
-    ...shadows.lg,
+    ...shadows.xl,
+  } as ViewStyle,
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    marginBottom: spacing.lg,
   } as ViewStyle,
   modalTitle: {
-    ...typography.h2,
+    fontSize: 24,
+    fontWeight: '600',
     color: colors.text.primary,
-    marginBottom: spacing.md,
     textAlign: 'center',
   } as TextStyle,
   modalQuestion: {
-    ...typography.body1,
+    fontSize: 20,
     color: colors.text.primary,
     textAlign: 'center',
-    marginBottom: spacing.lg,
-  } as TextStyle,
-  modalMessage: {
-    ...typography.body1,
-    color: colors.text.primary,
-    textAlign: 'center',
-    marginVertical: spacing.md,
-    lineHeight: 24,
-  } as TextStyle,
-  verseReference: {
-    ...typography.body2,
-    color: colors.text.secondary,
-    fontStyle: 'italic',
-    marginBottom: spacing.lg,
+    marginBottom: spacing.xl,
+    lineHeight: 28,
+    fontWeight: '500',
   } as TextStyle,
   modalButtons: {
-    flexDirection: 'row',
-    gap: spacing.md,
+    width: '100%',
+    gap: spacing.lg,
   } as ViewStyle,
   modalButton: {
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.xl,
-    borderRadius: borderRadius.md,
-    minWidth: 120,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.xl,
+    borderRadius: borderRadius.lg,
+    width: '100%',
   } as ViewStyle,
   modalButtonNo: {
     backgroundColor: colors.success,
@@ -529,7 +538,30 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
   } as ViewStyle,
   modalButtonText: {
-    ...typography.button,
+    fontSize: 16,
+    fontWeight: '600',
     color: colors.text.onPrimary,
+  } as TextStyle,
+  modalStreak: {
+    fontSize: 36,
+    fontWeight: '700',
+    color: '#60A5FA',
+    marginVertical: 16,
+  } as TextStyle,
+  modalMessage: {
+    fontSize: 16,
+    color: colors.text.primary,
+    textAlign: 'center',
+    marginVertical: spacing.md,
+    lineHeight: 24,
+  } as TextStyle,
+  
+  motivationVerse: {
+    fontSize: 16,
+    color: colors.text.primary,
+    textAlign: 'center',
+    fontStyle: 'italic',
+    marginVertical: spacing.md,
+    lineHeight: 24,
   } as TextStyle,
 });

@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Switch, TouchableOpacity, ScrollView, Alert, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Bell, Shield, Calendar, Lock, CircleAlert as AlertCircle, BookOpen, CircleHelp as HelpCircle, LogOut } from 'lucide-react-native';
+import { Bell, CircleAlert as AlertCircle, BookOpen, CircleHelp as HelpCircle, LogOut } from 'lucide-react-native';
 import { getUserProfile, saveSettings, getSettings, resetProgress } from '@/utils/storage';
 import { router } from 'expo-router';
 
+interface AppSettings {
+  notifications: boolean;
+}
+
 export default function SettingsScreen() {
   const [userProfile, setUserProfile] = useState<any>(null);
-  const [settings, setSettings] = useState({
+  const [settings, setSettings] = useState<AppSettings>({
     notifications: true,
-    contentFilter: true,
-    nightMode: false,
-    privacyMode: false,
   });
   
   useEffect(() => {
@@ -41,7 +42,7 @@ export default function SettingsScreen() {
   const handleResetProgress = () => {
     if (Platform.OS === 'web') {
       const confirmReset = window.confirm(
-        'Are you sure you want to reset all your progress? This action cannot be undone.'
+        'Tem certeza que deseja reiniciar todo seu progresso? Esta ação não pode ser desfeita.'
       );
       
       if (confirmReset) {
@@ -50,12 +51,12 @@ export default function SettingsScreen() {
       }
     } else {
       Alert.alert(
-        'Reset Progress',
-        'Are you sure you want to reset all your progress? This action cannot be undone.',
+        'Reiniciar Progresso',
+        'Tem certeza que deseja reiniciar todo seu progresso? Esta ação não pode ser desfeita.',
         [
-          { text: 'Cancel', style: 'cancel' },
+          { text: 'Cancelar', style: 'cancel' },
           { 
-            text: 'Reset', 
+            text: 'Reiniciar', 
             style: 'destructive',
             onPress: () => {
               resetProgress();
@@ -71,8 +72,8 @@ export default function SettingsScreen() {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.title}>Settings</Text>
-          <Text style={styles.subtitle}>Customize your experience</Text>
+          <Text style={styles.title}>Configurações</Text>
+          <Text style={styles.subtitle}>Personalize sua experiência</Text>
         </View>
         
         <ScrollView style={styles.content}>
@@ -88,89 +89,31 @@ export default function SettingsScreen() {
                 <View>
                   <Text style={styles.profileName}>{userProfile.name}</Text>
                   <Text style={styles.profileStatus}>
-                    {userProfile.streakDays} day streak • Goal: {userProfile.goal} days
+                    {userProfile.streakDays} dias sem cair • Meta: {userProfile.goal} dias
                   </Text>
                 </View>
               </View>
-              
-              <TouchableOpacity style={styles.editButton}>
-                <Text style={styles.editButtonText}>Edit Profile</Text>
-              </TouchableOpacity>
             </View>
           )}
           
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Preferences</Text>
+            <Text style={styles.sectionTitle}>Preferências</Text>
             
             <View style={styles.settingItem}>
               <View style={styles.settingInfo}>
                 <View style={styles.settingIconContainer}>
-                  <Bell size={20} color="#7E22CE" />
+                  <Bell size={20} color="#60A5FA" />
                 </View>
                 <View>
-                  <Text style={styles.settingTitle}>Notifications</Text>
-                  <Text style={styles.settingDescription}>Daily reminders and motivation</Text>
+                  <Text style={styles.settingTitle}>Notificações</Text>
+                  <Text style={styles.settingDescription}>Lembretes diários e motivação</Text>
                 </View>
               </View>
               <Switch
                 value={settings.notifications}
                 onValueChange={(value) => updateSetting('notifications', value)}
-                trackColor={{ false: '#E2E8F0', true: '#C4B5FD' }}
-                thumbColor={settings.notifications ? '#7E22CE' : '#fff'}
-              />
-            </View>
-            
-            <View style={styles.settingItem}>
-              <View style={styles.settingInfo}>
-                <View style={styles.settingIconContainer}>
-                  <Shield size={20} color="#7E22CE" />
-                </View>
-                <View>
-                  <Text style={styles.settingTitle}>Content Filter</Text>
-                  <Text style={styles.settingDescription}>Block explicit content</Text>
-                </View>
-              </View>
-              <Switch
-                value={settings.contentFilter}
-                onValueChange={(value) => updateSetting('contentFilter', value)}
-                trackColor={{ false: '#E2E8F0', true: '#C4B5FD' }}
-                thumbColor={settings.contentFilter ? '#7E22CE' : '#fff'}
-              />
-            </View>
-            
-            <View style={styles.settingItem}>
-              <View style={styles.settingInfo}>
-                <View style={styles.settingIconContainer}>
-                  <Calendar size={20} color="#7E22CE" />
-                </View>
-                <View>
-                  <Text style={styles.settingTitle}>Night Mode</Text>
-                  <Text style={styles.settingDescription}>Reduce blue light at night</Text>
-                </View>
-              </View>
-              <Switch
-                value={settings.nightMode}
-                onValueChange={(value) => updateSetting('nightMode', value)}
-                trackColor={{ false: '#E2E8F0', true: '#C4B5FD' }}
-                thumbColor={settings.nightMode ? '#7E22CE' : '#fff'}
-              />
-            </View>
-            
-            <View style={styles.settingItem}>
-              <View style={styles.settingInfo}>
-                <View style={styles.settingIconContainer}>
-                  <Lock size={20} color="#7E22CE" />
-                </View>
-                <View>
-                  <Text style={styles.settingTitle}>Privacy Mode</Text>
-                  <Text style={styles.settingDescription}>Hide app content when switching apps</Text>
-                </View>
-              </View>
-              <Switch
-                value={settings.privacyMode}
-                onValueChange={(value) => updateSetting('privacyMode', value)}
-                trackColor={{ false: '#E2E8F0', true: '#C4B5FD' }}
-                thumbColor={settings.privacyMode ? '#7E22CE' : '#fff'}
+                trackColor={{ false: '#E2E8F0', true: '#BFDBFE' }}
+                thumbColor={settings.notifications ? '#60A5FA' : '#fff'}
               />
             </View>
           </View>
@@ -180,21 +123,21 @@ export default function SettingsScreen() {
             
             <TouchableOpacity style={styles.supportItem}>
               <View style={styles.supportItemIconContainer}>
-                <BookOpen size={20} color="#7E22CE" />
+                <BookOpen size={20} color="#60A5FA" />
               </View>
               <Text style={styles.supportItemText}>Recursos & Artigos</Text>
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.supportItem}>
               <View style={styles.supportItemIconContainer}>
-                <HelpCircle size={20} color="#7E22CE" />
+                <HelpCircle size={20} color="#60A5FA" />
               </View>
               <Text style={styles.supportItemText}>Ajuda & FAQ</Text>
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.supportItem}>
               <View style={styles.supportItemIconContainer}>
-                <AlertCircle size={20} color="#7E22CE" />
+                <AlertCircle size={20} color="#60A5FA" />
               </View>
               <Text style={styles.supportItemText}>Sobre o Purify</Text>
             </TouchableOpacity>
@@ -272,7 +215,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#7E22CE',
+    backgroundColor: '#60A5FA',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
@@ -296,14 +239,14 @@ const styles = StyleSheet.create({
   editButton: {
     paddingVertical: 10,
     paddingHorizontal: 16,
-    backgroundColor: '#F3E8FF',
+    backgroundColor: '#EFF6FF',
     borderRadius: 8,
     alignItems: 'center',
   },
   editButtonText: {
     fontFamily: 'Poppins-Medium',
     fontSize: 14,
-    color: '#7E22CE',
+    color: '#60A5FA',
   },
   section: {
     marginBottom: 24,
@@ -336,7 +279,7 @@ const styles = StyleSheet.create({
   settingIconContainer: {
     width: 40,
     height: 40,
-    backgroundColor: '#F3E8FF',
+    backgroundColor: '#EFF6FF',
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
@@ -369,7 +312,7 @@ const styles = StyleSheet.create({
   supportItemIconContainer: {
     width: 40,
     height: 40,
-    backgroundColor: '#F3E8FF',
+    backgroundColor: '#EFF6FF',
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',

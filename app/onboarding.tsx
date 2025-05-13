@@ -60,6 +60,123 @@ export default function OnboardingScreen() {
     );
   };
 
+  const questions = {
+    1: {
+      title: "Tempo de Luta",
+      question: "Há quanto tempo você leva uma vida com pornografia e masturbação?",
+      options: [
+        { value: "a", label: "Menos de 6 meses" },
+        { value: "b", label: "Entre 6 meses e 1 ano" },
+        { value: "c", label: "Entre 1 e 3 anos" },
+        { value: "d", label: "Entre 3 e 5 anos" },
+        { value: "e", label: "Mais de 5 anos" }
+      ]
+    },
+    2: {
+      title: "Frequência",
+      question: "Com que frequência você recorre à pornografia ou à masturbação?",
+      options: [
+        { value: "a", label: "Todos os dias" },
+        { value: "b", label: "Algumas vezes por semana" },
+        { value: "c", label: "Uma vez por semana" },
+        { value: "d", label: "Raramente (menos de uma vez por semana)" },
+        { value: "e", label: "Não tenho um padrão fixo" }
+      ]
+    },
+    3: {
+      title: "Padrões",
+      question: "Você consegue identificar momentos específicos do dia ou situações que mais te levam a isso?",
+      options: [
+        { value: "a", label: "Sim, geralmente à noite" },
+        { value: "b", label: "Sim, quando estou sozinho(a)" },
+        { value: "c", label: "Sim, quando estou entediado(a), triste ou ansioso(a)" },
+        { value: "d", label: "Não, acontece de forma aleatória" },
+        { value: "e", label: "Nunca parei para pensar sobre isso" }
+      ]
+    },
+    4: {
+      title: "Impacto nos Relacionamentos",
+      question: "Como esse vício tem afetado seus relacionamentos?",
+      options: [
+        { value: "a", label: "Tem prejudicado minhas relações amorosas" },
+        { value: "b", label: "Me sinto distante da família" },
+        { value: "c", label: "Afeta minha vida social" },
+        { value: "d", label: "Não percebo impacto significativo" },
+        { value: "e", label: "Prefiro não responder" }
+      ]
+    },
+    5: {
+      title: "Impacto Espiritual",
+      question: "Como você sente que isso afeta sua vida espiritual?",
+      options: [
+        { value: "a", label: "Me sinto distante de Deus" },
+        { value: "b", label: "Tenho dificuldade em orar" },
+        { value: "c", label: "Me sinto indigno(a)" },
+        { value: "d", label: "Evito participar de atividades religiosas" },
+        { value: "e", label: "Busco mais a Deus após as quedas" }
+      ]
+    },
+    6: {
+      title: "Gatilhos Emocionais",
+      question: "Quais emoções geralmente te levam a recair? (Selecione todas que se aplicam)",
+      options: [
+        { value: "Ansiedade", label: "Ansiedade" },
+        { value: "Solidão", label: "Solidão" },
+        { value: "Estresse", label: "Estresse" },
+        { value: "Tristeza", label: "Tristeza" },
+        { value: "Tédio", label: "Tédio" }
+      ],
+      isMultiSelect: true
+    },
+    7: {
+      title: "Motivação para Mudança",
+      question: "O que te motiva a buscar libertação? (Selecione todas que se aplicam)",
+      options: [
+        { value: "Fé", label: "Minha fé e relacionamento com Deus" },
+        { value: "Relacionamentos", label: "Melhorar meus relacionamentos" },
+        { value: "Saúde", label: "Saúde mental e física" },
+        { value: "Autoestima", label: "Melhorar minha autoestima" },
+        { value: "Futuro", label: "Construir um futuro melhor" }
+      ],
+      isMultiSelect: true
+    },
+    8: {
+      title: "Tentativas Anteriores",
+      question: "Qual foi seu maior período sem recaídas?",
+      options: [
+        { value: "a", label: "Nunca consegui mais que uma semana" },
+        { value: "b", label: "Entre 1 semana e 1 mês" },
+        { value: "c", label: "Entre 1 e 3 meses" },
+        { value: "d", label: "Mais de 3 meses" },
+        { value: "e", label: "Nunca tentei realmente parar" }
+      ]
+    },
+    9: {
+      title: "Suporte",
+      question: "Você tem alguém com quem pode conversar abertamente sobre isso?",
+      options: [
+        { value: "a", label: "Sim, tenho um mentor/líder espiritual" },
+        { value: "b", label: "Sim, amigos próximos" },
+        { value: "c", label: "Sim, participo de um grupo de apoio" },
+        { value: "d", label: "Não, mas gostaria de ter" },
+        { value: "e", label: "Não me sinto confortável em compartilhar" }
+      ]
+    },
+    10: {
+      title: "Compromisso",
+      question: "Qual seu nível de comprometimento com a recuperação?",
+      options: [
+        { value: "a", label: "Totalmente comprometido(a)" },
+        { value: "b", label: "Quero tentar, mas tenho medo" },
+        { value: "c", label: "Vou dar o meu melhor" },
+        { value: "d", label: "Ainda tenho dúvidas" },
+        { value: "e", label: "Preciso de mais motivação" }
+      ]
+    }
+  };
+
+  const currentQuestion = questions[step as keyof typeof questions];
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <View style={styles.header}>
@@ -145,41 +262,56 @@ export default function OnboardingScreen() {
 
         {step === 2 && (
           <View style={styles.stepContent}>
-            <Text style={styles.stepTitle}>Sua Jornada</Text>
+            <Text style={styles.stepTitle}>Tempo de Luta</Text>
             <Text style={styles.stepDescription}>
-              Sabemos que estas perguntas são pessoais. Suas respostas são confidenciais e nos ajudam a personalizar sua jornada de recuperação da melhor forma possível.
+              Há quanto tempo você leva uma vida com pornografia e masturbação?
             </Text>
             
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Há quanto tempo você está enfrentando essa luta?</Text>
-              <View style={styles.radioGroup}>
-                <TouchableOpacity 
-                  style={[styles.radioButton, addictionTime === 'Menos de 1 ano' && styles.radioButtonSelected]} 
-                  onPress={() => setAddictionTime('Menos de 1 ano')}
-                >
-                  <Text style={[styles.radioText, addictionTime === 'Menos de 1 ano' && styles.radioTextSelected]}>
-                    Menos de 1 ano
-                  </Text>
-                </TouchableOpacity>
-                
-                <TouchableOpacity 
-                  style={[styles.radioButton, addictionTime === '1-5 anos' && styles.radioButtonSelected]} 
-                  onPress={() => setAddictionTime('1-5 anos')}
-                >
-                  <Text style={[styles.radioText, addictionTime === '1-5 anos' && styles.radioTextSelected]}>
-                    1-5 anos
-                  </Text>
-                </TouchableOpacity>
-                
-                <TouchableOpacity 
-                  style={[styles.radioButton, addictionTime === '5+ anos' && styles.radioButtonSelected]} 
-                  onPress={() => setAddictionTime('5+ anos')}
-                >
-                  <Text style={[styles.radioText, addictionTime === '5+ anos' && styles.radioTextSelected]}>
-                    5+ anos
-                  </Text>
-                </TouchableOpacity>
-              </View>
+            <View style={styles.radioGroup}>
+              <TouchableOpacity 
+                style={[styles.radioButton, addictionTime === 'Menos de 6 meses' && styles.radioButtonSelected]} 
+                onPress={() => setAddictionTime('Menos de 6 meses')}
+              >
+                <Text style={[styles.radioText, addictionTime === 'Menos de 6 meses' && styles.radioTextSelected]}>
+                  Menos de 6 meses
+                </Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={[styles.radioButton, addictionTime === 'Entre 6 meses e 1 ano' && styles.radioButtonSelected]} 
+                onPress={() => setAddictionTime('Entre 6 meses e 1 ano')}
+              >
+                <Text style={[styles.radioText, addictionTime === 'Entre 6 meses e 1 ano' && styles.radioTextSelected]}>
+                  Entre 6 meses e 1 ano
+                </Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={[styles.radioButton, addictionTime === 'Entre 1 e 3 anos' && styles.radioButtonSelected]} 
+                onPress={() => setAddictionTime('Entre 1 e 3 anos')}
+              >
+                <Text style={[styles.radioText, addictionTime === 'Entre 1 e 3 anos' && styles.radioTextSelected]}>
+                  Entre 1 e 3 anos
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={[styles.radioButton, addictionTime === 'Entre 3 e 5 anos' && styles.radioButtonSelected]} 
+                onPress={() => setAddictionTime('Entre 3 e 5 anos')}
+              >
+                <Text style={[styles.radioText, addictionTime === 'Entre 3 e 5 anos' && styles.radioTextSelected]}>
+                  Entre 3 e 5 anos
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={[styles.radioButton, addictionTime === 'Mais de 5 anos' && styles.radioButtonSelected]} 
+                onPress={() => setAddictionTime('Mais de 5 anos')}
+              >
+                <Text style={[styles.radioText, addictionTime === 'Mais de 5 anos' && styles.radioTextSelected]}>
+                  Mais de 5 anos
+                </Text>
+              </TouchableOpacity>
             </View>
 
             <TouchableOpacity 
@@ -270,50 +402,56 @@ export default function OnboardingScreen() {
 
         {step === 4 && (
           <View style={styles.stepContent}>
-            <Text style={styles.stepTitle}>Rede de Apoio</Text>
+            <Text style={styles.stepTitle}>Sentimentos Pós-Recaída</Text>
             <Text style={styles.stepDescription}>
-              Ter suporte pode fazer uma grande diferença na sua jornada de recuperação. Selecione todas as opções que se aplicam.
+              Como você geralmente se sente após uma recaída?
             </Text>
             
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Com quem você pode contar?</Text>
-              <View style={styles.radioGroup}>
-                <TouchableOpacity 
-                  style={[styles.radioButton, supportSystem.includes('Família') && styles.radioButtonSelected]} 
-                  onPress={() => toggleSupport('Família')}
-                >
-                  <Text style={[styles.radioText, supportSystem.includes('Família') && styles.radioTextSelected]}>
-                    Família
-                  </Text>
-                </TouchableOpacity>
-                
-                <TouchableOpacity 
-                  style={[styles.radioButton, supportSystem.includes('Amigos') && styles.radioButtonSelected]} 
-                  onPress={() => toggleSupport('Amigos')}
-                >
-                  <Text style={[styles.radioText, supportSystem.includes('Amigos') && styles.radioTextSelected]}>
-                    Amigos
-                  </Text>
-                </TouchableOpacity>
-                
-                <TouchableOpacity 
-                  style={[styles.radioButton, supportSystem.includes('Terapeuta') && styles.radioButtonSelected]} 
-                  onPress={() => toggleSupport('Terapeuta')}
-                >
-                  <Text style={[styles.radioText, supportSystem.includes('Terapeuta') && styles.radioTextSelected]}>
-                    Terapeuta
-                  </Text>
-                </TouchableOpacity>
+            <View style={styles.radioGroup}>
+              <TouchableOpacity 
+                style={[styles.radioButton, supportSystem.includes('Culpado(a) e envergonhado(a)') && styles.radioButtonSelected]} 
+                onPress={() => toggleSupport('Culpado(a) e envergonhado(a)')}
+              >
+                <Text style={[styles.radioText, supportSystem.includes('Culpado(a) e envergonhado(a)') && styles.radioTextSelected]}>
+                  Culpado(a) e envergonhado(a)
+                </Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={[styles.radioButton, supportSystem.includes('Frustrado(a) e desanimado(a)') && styles.radioButtonSelected]} 
+                onPress={() => toggleSupport('Frustrado(a) e desanimado(a)')}
+              >
+                <Text style={[styles.radioText, supportSystem.includes('Frustrado(a) e desanimado(a)') && styles.radioTextSelected]}>
+                  Frustrado(a) e desanimado(a)
+                </Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={[styles.radioButton, supportSystem.includes('Ansioso(a) e preocupado(a)') && styles.radioButtonSelected]} 
+                onPress={() => toggleSupport('Ansioso(a) e preocupado(a)')}
+              >
+                <Text style={[styles.radioText, supportSystem.includes('Ansioso(a) e preocupado(a)') && styles.radioTextSelected]}>
+                  Ansioso(a) e preocupado(a)
+                </Text>
+              </TouchableOpacity>
 
-                <TouchableOpacity 
-                  style={[styles.radioButton, supportSystem.includes('Ninguém ainda') && styles.radioButtonSelected]} 
-                  onPress={() => toggleSupport('Ninguém ainda')}
-                >
-                  <Text style={[styles.radioText, supportSystem.includes('Ninguém ainda') && styles.radioTextSelected]}>
-                    Ninguém ainda
-                  </Text>
-                </TouchableOpacity>
-              </View>
+              <TouchableOpacity 
+                style={[styles.radioButton, supportSystem.includes('Determinado(a) a recomeçar') && styles.radioButtonSelected]} 
+                onPress={() => toggleSupport('Determinado(a) a recomeçar')}
+              >
+                <Text style={[styles.radioText, supportSystem.includes('Determinado(a) a recomeçar') && styles.radioTextSelected]}>
+                  Determinado(a) a recomeçar
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={[styles.radioButton, supportSystem.includes('Indiferente') && styles.radioButtonSelected]} 
+                onPress={() => toggleSupport('Indiferente')}
+              >
+                <Text style={[styles.radioText, supportSystem.includes('Indiferente') && styles.radioTextSelected]}>
+                  Indiferente
+                </Text>
+              </TouchableOpacity>
             </View>
 
             <TouchableOpacity 
@@ -325,85 +463,76 @@ export default function OnboardingScreen() {
               <ArrowRight size={20} color="#fff" />
             </TouchableOpacity>
 
-            <TouchableOpacity 
-              style={styles.backButton}
-              onPress={handleBack}
-            >
-              <Text style={styles.backButtonText}>Voltar</Text>
-            </TouchableOpacity>
+            {step > 1 && (
+              <TouchableOpacity 
+                style={styles.backButton}
+                onPress={handleBack}
+              >
+                <Text style={styles.backButtonText}>Voltar</Text>
+              </TouchableOpacity>
+            )}
           </View>
         )}
 
         {step === 5 && (
           <View style={styles.stepContent}>
-            <Text style={styles.stepTitle}>Seus Desafios</Text>
+            <Text style={styles.stepTitle}>Momentos de Risco</Text>
             <Text style={styles.stepDescription}>
-              Refletir sobre o que funcionou antes pode nos ajudar a construir estratégias mais eficazes.
+              Em quais momentos você percebe que está mais vulnerável a cair neste comportamento?
             </Text>
             
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Qual é seu maior desafio na recuperação?</Text>
-              <View style={styles.radioGroup}>
-                <TouchableOpacity 
-                  style={[styles.radioButton, challenges.includes('Solidão') && styles.radioButtonSelected]} 
-                  onPress={() => {
-                    setChallenges(prev => 
-                      prev.includes('Solidão')
-                        ? prev.filter(c => c !== 'Solidão')
-                        : [...prev, 'Solidão']
-                    );
-                  }}
-                >
-                  <Text style={[styles.radioText, challenges.includes('Solidão') && styles.radioTextSelected]}>
-                    Solidão
-                  </Text>
-                </TouchableOpacity>
-                
-                <TouchableOpacity 
-                  style={[styles.radioButton, challenges.includes('Pressão social') && styles.radioButtonSelected]} 
-                  onPress={() => {
-                    setChallenges(prev => 
-                      prev.includes('Pressão social')
-                        ? prev.filter(c => c !== 'Pressão social')
-                        : [...prev, 'Pressão social']
-                    );
-                  }}
-                >
-                  <Text style={[styles.radioText, challenges.includes('Pressão social') && styles.radioTextSelected]}>
-                    Pressão social
-                  </Text>
-                </TouchableOpacity>
-                
-                <TouchableOpacity 
-                  style={[styles.radioButton, challenges.includes('Falta de motivação') && styles.radioButtonSelected]} 
-                  onPress={() => {
-                    setChallenges(prev => 
-                      prev.includes('Falta de motivação')
-                        ? prev.filter(c => c !== 'Falta de motivação')
-                        : [...prev, 'Falta de motivação']
-                    );
-                  }}
-                >
-                  <Text style={[styles.radioText, challenges.includes('Falta de motivação') && styles.radioTextSelected]}>
-                    Falta de motivação
-                  </Text>
-                </TouchableOpacity>
+            <View style={styles.radioGroup}>
+              <TouchableOpacity 
+                style={[styles.radioButton, challenges.includes('Antes de dormir') && styles.radioButtonSelected]} 
+                onPress={() => setChallenges(prev => 
+                  prev.includes('Antes de dormir')
+                    ? prev.filter(c => c !== 'Antes de dormir')
+                    : [...prev, 'Antes de dormir']
+                )}
+              >
+                <Text style={[styles.radioText, challenges.includes('Antes de dormir') && styles.radioTextSelected]}>
+                  Antes de dormir
+                </Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={[styles.radioButton, challenges.includes('Quando estou sozinho(a)') && styles.radioButtonSelected]} 
+                onPress={() => setChallenges(prev => 
+                  prev.includes('Quando estou sozinho(a)')
+                    ? prev.filter(c => c !== 'Quando estou sozinho(a)')
+                    : [...prev, 'Quando estou sozinho(a)']
+                )}
+              >
+                <Text style={[styles.radioText, challenges.includes('Quando estou sozinho(a)') && styles.radioTextSelected]}>
+                  Quando estou sozinho(a)
+                </Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={[styles.radioButton, challenges.includes('Após um dia estressante') && styles.radioButtonSelected]} 
+                onPress={() => setChallenges(prev => 
+                  prev.includes('Após um dia estressante')
+                    ? prev.filter(c => c !== 'Após um dia estressante')
+                    : [...prev, 'Após um dia estressante']
+                )}
+              >
+                <Text style={[styles.radioText, challenges.includes('Após um dia estressante') && styles.radioTextSelected]}>
+                  Após um dia estressante
+                </Text>
+              </TouchableOpacity>
 
-                <TouchableOpacity 
-                  style={[styles.radioButton, challenges.includes('Recaídas frequentes') && styles.radioButtonSelected]} 
-                  onPress={() => {
-                    setChallenges(prev => 
-                      prev.includes('Recaídas frequentes')
-                        ? prev.filter(c => c !== 'Recaídas frequentes')
-                        : [...prev, 'Recaídas frequentes']
-                    );
-                  }}
-                >
-                  <Text style={[styles.radioText, challenges.includes('Recaídas frequentes') && styles.radioTextSelected]}>
-                    Recaídas frequentes
-                  </Text>
-                </TouchableOpacity>
-              </View>
+              <TouchableOpacity 
+                style={[styles.radioButton, challenges.includes('Quando estou entediado(a)') && styles.radioButtonSelected]} 
+                onPress={() => setChallenges(prev => 
+                  prev.includes('Quando estou entediado(a)')
+                    ? prev.filter(c => c !== 'Quando estou entediado(a)')
+                    : [...prev, 'Quando estou entediado(a)']
+                )}
+              >
+                <Text style={[styles.radioText, challenges.includes('Quando estou entediado(a)') && styles.radioTextSelected]}>
+                  Quando estou entediado(a)
+                </Text>
+              </TouchableOpacity>
             </View>
 
             <TouchableOpacity 
@@ -415,12 +544,14 @@ export default function OnboardingScreen() {
               <ArrowRight size={20} color="#fff" />
             </TouchableOpacity>
 
-            <TouchableOpacity 
-              style={styles.backButton}
-              onPress={handleBack}
-            >
-              <Text style={styles.backButtonText}>Voltar</Text>
-            </TouchableOpacity>
+            {step > 1 && (
+              <TouchableOpacity 
+                style={styles.backButton}
+                onPress={handleBack}
+              >
+                <Text style={styles.backButtonText}>Voltar</Text>
+              </TouchableOpacity>
+            )}
           </View>
         )}
 
@@ -579,9 +710,9 @@ const styles = StyleSheet.create({
   },
   stepTitle: {
     fontFamily: 'Poppins-SemiBold',
-    fontSize: 22,
+    fontSize: 24,
     color: '#1E293B',
-    marginBottom: 8,
+    marginBottom: 12,
     textAlign: 'center',
   },
   stepDescription: {
@@ -589,7 +720,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#64748B',
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: 8,
+    paddingHorizontal: 20,
     lineHeight: 24,
   },
   inputGroup: {
@@ -614,16 +746,20 @@ const styles = StyleSheet.create({
     color: '#0F172A',
   },
   radioGroup: {
-    marginTop: 8,
+    width: '100%',
+    marginTop: 24,
+    paddingHorizontal: 16,
   },
   radioButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
     borderWidth: 1,
     borderColor: '#E2E8F0',
-    borderRadius: 8,
+    borderRadius: 12,
     marginBottom: 12,
     backgroundColor: '#F8FAFC',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
   },
   radioButtonSelected: {
     borderColor: '#60A5FA',
@@ -633,6 +769,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Regular',
     fontSize: 16,
     color: '#334155',
+    textAlign: 'left',
   },
   radioTextSelected: {
     color: '#60A5FA',
